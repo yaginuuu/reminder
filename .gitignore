@@ -1,1 +1,4 @@
-php.ini
+/composer.phar
+composer.lock
+composer.json
+/tests

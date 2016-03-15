@@ -1,23 +1,21 @@
 <?php
 
 /**
- * ChatWorkAPI経由で以下のことができる
- *
- * ・ChatWork情報の取得->get()
- * ・ChatWork情報の送信->post()
- * ・メッセージを送信->sendMessage()
+ * ChatWorkAPIを利用する
  *
  * @author yaginuuu <yaginuma.takuya@hamee.co.jp>
  * @copyright Hamee.inc All Rights Reserved
- * @param string $chat_work_token ChatWorkAPIキー
  */
 class ChatWorkApi{
     const HOST_NAME = 'https://api.chatwork.com';
     private $chat_work_token;
 
     public function __construct($chat_work_token) {
-        if(empty($chat_work_token)) throw new Exception('APIキーが存在しません.');
-        $this->chat_work_token = $chat_work_token;
+        if(strlen($chat_work_token) === 0){
+            echo 'APIキーを入力してください!';
+        }else{
+            $this->chat_work_token = $chat_work_token;
+        }
     }
 
     /**
@@ -29,19 +27,18 @@ class ChatWorkApi{
      *
      * @param string end_point_url ChatWorkAPIのエンドポイント
      * @return array 取得した情報の連想配列の配列
-     * @todo
      **/
     public function get($end_point_url){
-        try{
-            $chat_work_data = $this->execCurl($end_point_url, null);
-        }catch(Exception $e){
-            echo $e->getMessage();
-        }
+        $chat_work_data = $this->execCurl($end_point_url, null);
 
         // TODO: 変数チェック
         $json_decode_data = json_decode($chat_work_data, true);
 
-        return $json_decode_data;
+        if(empty($json_decode_data)){
+            echo '';
+        }else{
+            return $json_decode_data;
+        }
     }
 
     /**
@@ -50,14 +47,9 @@ class ChatWorkApi{
      * @param string end_point_url エンドポイントURL
      * @param string message_text 送信するメッセージテキスト
      * @return void
-     * @todo
      */
     public function post($end_point_url, $message_text){
-        try{
-            $this->execCurl($end_point_url, $message_text);
-        }catch(Exception $e){
-            echo $e->getMessage();
-        }
+        $this->execCurl($end_point_url, $message_text);
     }
 
     /**
@@ -68,11 +60,10 @@ class ChatWorkApi{
      * @param int room_id メッセージを送信するroom_id
      * @param string message_text 送信するメッセージテキスト
      * @return void
-     * @todo
      */
-    public function sendMessage($room_id, $message_text){
-        if(empty($room_id)) throw new Exception('ルームIDが存在しません.');
-        if(empty($message_text)) throw new Exception('送信するメッセージが存在しません.');
+    public function sendMessage($message_text, $key, $room_id){
+        if(empty($room_id)) throw new Exception('ルームIDを入力してください.');
+        if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.');
 
         $end_point_url = "/v1/rooms/{$room_id}/messages";
 
@@ -88,10 +79,9 @@ class ChatWorkApi{
      * @param string end_point_url エンドポイントURL
      * @param string message_text 送信するメッセージテキスト
      * @return array 通信結果
-     * @todo
      */
     private function execCurl($end_point_url, $message_text){
-        if(empty($end_point_url)) throw new Exception('エンドポイントが存在しません.');
+        if(empty($end_point_url)) throw new Exception('エンドポイントを入力してください.');
 
         $ch = curl_init();
 
@@ -105,11 +95,13 @@ class ChatWorkApi{
         $errno = curl_errno($ch);
         $error = curl_error($ch);
 
-        curl_close($ch);
-
-        if (CURLE_OK !== $errno) {
-            throw new Exception($error, $errno);
+        if($errno) {
+            $info = curl_getinfo($ch);
+            throw new Exception('HTTPステータスコードは'.$info['http_code'].PHP_EOL
+                    .$error);
         }
+
+        curl_close($ch);
         return $curl_data;
     }
 }

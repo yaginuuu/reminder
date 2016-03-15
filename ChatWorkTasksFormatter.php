@@ -1,20 +1,17 @@
 <?php
 
 /**
- * ChatWorkのタスクをリマインドするメッセージを整形することができる
- *
- * ・getFormatMessage()->メッセージを整形
+ * ChatWorkのタスクをリマインドするメッセージを整形する
  *
  * @author yaginuuu <yaginuma.takuya@hamee.co.jp>
  * @copyright Hamee.inc All Rights Reserved
- * @param array tasks ChatWorkにおけるタスクの配列
  */
 class ChatWorkTasksFormatter{
     const CHAT_WORK_HOST_URL = 'https://kcw.kddi.ne.jp';
     private $tasks;
 
     public function __construct($tasks) {
-        if(empty($tasks)) throw new Exception('タスク情報が存在しません.');
+        if(empty($tasks)) throw new Exception('タスク情報を入力してください.');
         $this->tasks = $tasks;
     }
 
@@ -60,8 +57,11 @@ class ChatWorkTasksFormatter{
             $target_task = null;
         }
 
-        if(empty($message_text)) throw new Exception('メッセージテキストが存在しません.');
-        return $message_text;
+        if(empty($message_text) === 0){
+            echo 'メッセージテキストが存在しません.';
+        }else{
+            return $message_text;
+        }
     }
 
     /**
@@ -97,8 +97,12 @@ class ChatWorkTasksFormatter{
                     'assigned_by_account_id' => $task['assigned_by_account']['account_id']
                     );
         }
-        krsort($deadline_list);
+        $isKrsort = krsort($deadline_list);
 
-        return $deadline_list;
+        if($isKrsort === false){
+            echo 'ソートできません.';
+        }else{
+            return $deadline_list;
+        }
     }
 }

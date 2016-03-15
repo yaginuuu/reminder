@@ -9,6 +9,10 @@
 
 ## Usage
 ```
-$ php main.php 自分のChatWorkのAPIトークン
+$ git clone https://bitbucket.org/yaginuuu/task_reminder_for_chatwork
+$ crontab -e
 ```
-＊コマンドライン引数にChatWorkのAPIキーを設定してください。
+以下を入力してください.
+```
+0 10 0 0 1-5 php_path ./task_reminder_for_chatwork/main.php 自分のChatWorkのAPIトークン
+```
