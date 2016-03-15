@@ -12,8 +12,8 @@ try{
     $chat_work_tasks_fomatter = new ChatWorkTasksFormatter($chat_work_tasks);
     $chat_work_formated_messages = $chat_work_tasks_fomatter->getFormatMessage();
 
-    // array_walk($chat_work_formated_messages,
-    //         array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
+    array_walk($chat_work_formated_messages,
+            array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
 }catch(Exception $e){
     echo $e->getMessage();
 }
