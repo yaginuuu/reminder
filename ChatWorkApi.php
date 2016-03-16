@@ -29,7 +29,7 @@ class ChatWorkApi{
      * @return array 取得した情報の連想配列の配列
      **/
     public function get($end_point_url){
-        $chat_work_data = $this->execCurl($end_point_url, null);
+        $chat_work_data = $this->execCurl($end_point_url, null, null, null);
 
         $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
         $json_decode_data =  $json->decode($chat_work_data);
@@ -46,16 +46,18 @@ class ChatWorkApi{
      *
      * @param string end_point_url エンドポイントURL
      * @param string message_text 送信するメッセージテキスト
+     * @param int to_id タスクの担当者ID
+     * @param time limit タスクの期限
      * @return void
      */
-    public function post($end_point_url, $message_text){
-        $this->execCurl($end_point_url, $message_text);
+    public function post($end_point_url, $message_text, $to_id, $limit){
+        $this->execCurl($end_point_url, $message_text, $to_id, $limit);
     }
 
     /**
      * メッセージを送信する
      *
-     * 1. ChatWorkの指定したroomにメッセージを送信
+     * 指定したroomにメッセージを送信 ＊room_id, message_textは必須
      *
      * @param int room_id メッセージを送信するroom_id
      * @param string message_text 送信するメッセージテキスト
@@ -67,7 +69,27 @@ class ChatWorkApi{
 
         $end_point_url = "/v1/rooms/{$room_id}/messages";
 
-        $this->post($end_point_url, $message_text);
+        $this->post($end_point_url, $message_text, null, null);
+    }
+
+    /**
+     * タスクを送信する
+     *
+     * 指定したroomにタスクを作成 ＊room_id, task_text, to_idは必須
+     *
+     * @param int room_id メッセージを送信するroom_id
+     * @param string task_text 送信するタスク概要
+     * @param int to_id タスクの担当者
+     * @param time limit タスクの期限
+     * @return void
+     */
+    public function sendTask($task_text, $key, $room_id, $to_id, $limit){
+        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.');
+        if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.');
+
+        $end_point_url = "/v1/rooms/{$room_id}/tasks";
+
+        $this->post($end_point_url, $task_text, $to_id, $limit);
     }
 
     /**
@@ -77,19 +99,30 @@ class ChatWorkApi{
      * 2. 通信結果を返す
      *
      * @param string end_point_url エンドポイントURL
-     * @param string message_text 送信するメッセージテキスト
+     * @param string message_text 送信するメッセージテキストまたは送信するタスクの概要
+     * @param int to_id タスクの担当者
+     * @param time limit タスクの期限
      * @return array 通信結果
      */
-    private function execCurl($end_point_url, $message_text){
+    private function execCurl($end_point_url, $message_text, $to_id, $limit){
         if(empty($end_point_url)) throw new Exception('エンドポイントを入力してください.');
 
         $ch = curl_init();
 
+        echo $end_point_url.PHP_EOL;
+        echo $message_text.PHP_EOL;
+        echo $to_id.PHP_EOL;
+        echo $limit.PHP_EOL;
         curl_setopt($ch, CURLOPT_URL, self::HOST_NAME.$end_point_url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-ChatWorkToken: {$this->chat_work_token}"));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         if(isset($message_text)){
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('body' => $message_text)));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                        array(
+                            'body'   => $message_text,
+                            'to_ids' => $to_id,
+                            'limit'  => $limit
+                            )));
         }
         $curl_data = curl_exec($ch);
         $errno = curl_errno($ch);
