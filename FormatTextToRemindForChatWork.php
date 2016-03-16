@@ -92,11 +92,11 @@ class FormatTextToRemindForChatWork{
                 }
             }
         }
-        $task_text = '以下のタスクの期限が過ぎています。'.PHP_EOL
+        $task_text = '(*)タスクの見直し依頼(*)'.PHP_EOL
+            .'以下のタスクの期限が過ぎています。'.PHP_EOL
             .'期限は'.$limit_time.'まででした。'.PHP_EOL
             .'タスクの見直しを行ってください！！'.PHP_EOL
             .'[info]'.$target_task.'[/info]';
-
 
         return $task_text;
     }
