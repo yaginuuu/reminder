@@ -22,10 +22,10 @@ class FormatTextToRemindForChatWork{
      * @return array タスク期限ごとのメッセージの配列
      */
     public function getFormatMessageText(){
+        $today = strtotime(date('Y/m/d'));
         $last_week = strtotime(date('c', strtotime('-1 week')));
         $tomorrow = strtotime(date('c', strtotime('+1 day')));
         $deadline_list = $this->getFormatTasks($last_week, $tomorrow);
-        $today = strtotime(date('Y/m/d'));
         $message_text = array();
 
         foreach($deadline_list as $deadline => $tasks){
@@ -61,9 +61,10 @@ class FormatTextToRemindForChatWork{
 
         if(empty($message_text)){
             echo 'メッセージテキストが存在しません.';
-        }else{
-            return $message_text;
+            $message_text = null;
         }
+
+        return $message_text;
     }
 
     /**
@@ -77,6 +78,7 @@ class FormatTextToRemindForChatWork{
         $from_date = strtotime(date('c', strtotime('-1 week -1 day')));
         $to_date   = strtotime(date('c', strtotime('-1 week')));
         $look_again_tasks = $this->getFormatTasks($from_date, $to_date);
+        if(is_null($look_again_tasks)) return null;
 
         foreach($look_again_tasks as $deadline => $tasks){
             $limit_time = date('Y年m月d日', $deadline);
@@ -134,10 +136,15 @@ class FormatTextToRemindForChatWork{
                     'assigned_by_account_id' => $task['assigned_by_account']['account_id']
                     );
         }
-        $isKrsort = krsort($deadline_list);
+        if(empty($deadline_list)){
+            echo 'タスクが存在しません.';
+            $deadline_list = null;
+        }else{
+            $isKrsort = krsort($deadline_list);
+        }
 
         if($isKrsort === false){
-            echo 'ソートできません. タスクが存在しません.';
+            echo 'ソートできません.';
             $deadline_list = null;
         }
 

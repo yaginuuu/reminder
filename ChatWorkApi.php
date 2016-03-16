@@ -77,7 +77,7 @@ class ChatWorkApi{
      *
      * 指定したroomにタスクを作成 ＊room_id, task_text, to_idは必須
      *
-     * @param int room_id メッセージを送信するroom_id
+     * @param int room_id メッセージを送信するroomID
      * @param string task_text 送信するタスク概要
      * @param int to_id タスクの担当者
      * @param time limit タスクの期限
