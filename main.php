@@ -18,10 +18,15 @@ try{
     if(isset($formatted_text_task)){
         $chat_work_api->sendTask($formatted_text_task, 0, $myself_data['room_id'],
                 $myself_data['account_id'], $today);
+    }else{
+        echo '見直しするタスク(期限が8日前)が存在しません.'.PHP_EOL;
     }
+
     if(isset($formatted_text_messages)){
         array_walk($formatted_text_messages,
                 array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
+    }else{
+        echo 'リマインドするタスク(期限が今日-7日前)が存在しません.'.PHP_EOL;
     }
 }catch(Exception $e){
     echo $e->getMessage();

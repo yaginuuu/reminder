@@ -26,6 +26,7 @@ class FormatTextToRemindForChatWork{
         $last_week = strtotime(date('c', strtotime('-1 week')));
         $tomorrow = strtotime(date('c', strtotime('+1 day')));
         $deadline_list = $this->getFormatTasks($last_week, $tomorrow);
+        if(is_null($deadline_list)) return null;
         $message_text = array();
 
         foreach($deadline_list as $deadline => $tasks){
@@ -60,8 +61,7 @@ class FormatTextToRemindForChatWork{
         }
 
         if(empty($message_text)){
-            echo 'メッセージテキストが存在しません.';
-            $message_text = null;
+            return null;
         }
 
         return $message_text;
@@ -103,7 +103,6 @@ class FormatTextToRemindForChatWork{
         return $task_text;
     }
 
-
     /**
      * ChatWorkのタスク情報を期間を指定し, 整形する
      *
@@ -137,15 +136,13 @@ class FormatTextToRemindForChatWork{
                     );
         }
         if(empty($deadline_list)){
-            echo 'タスクが存在しません.';
-            $deadline_list = null;
+            return null;
         }else{
             $isKrsort = krsort($deadline_list);
         }
 
         if($isKrsort === false){
-            echo 'ソートできません.';
-            $deadline_list = null;
+            return null;
         }
 
         return $deadline_list;
