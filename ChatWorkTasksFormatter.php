@@ -24,7 +24,7 @@ class ChatWorkTasksFormatter{
     public function getFormatMessage(){
         $deadline_list = $this->getFormatTasks();
         $today = strtotime(date('Y/m/d'));
-        $message_text = [];
+        $message_text = array();
 
         foreach($deadline_list as $deadline => $tasks){
             $deadline = strtotime(date('Y/m/d', $deadline));

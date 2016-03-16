@@ -31,8 +31,8 @@ class ChatWorkApi{
     public function get($end_point_url){
         $chat_work_data = $this->execCurl($end_point_url, null);
 
-        // TODO: 変数チェック
-        $json_decode_data = json_decode($chat_work_data, true);
+        $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+        $json_decode_data =  $json->decode($chat_work_data);
 
         if(empty($json_decode_data)){
             echo '';
@@ -89,7 +89,7 @@ class ChatWorkApi{
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-ChatWorkToken: {$this->chat_work_token}"));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         if(isset($message_text)){
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['body' => $message_text]));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('body' => $message_text)));
         }
         $curl_data = curl_exec($ch);
         $errno = curl_errno($ch);
