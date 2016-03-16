@@ -19,8 +19,8 @@ try{
         $chat_work_api->sendTask($formatted_text_task, 0, $myself_data['room_id'],
                 $myself_data['account_id'], $today);
     }
-    // array_walk($formatted_text_messages,
-    //         array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
+    array_walk($formatted_text_messages,
+            array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
 }catch(Exception $e){
     echo $e->getMessage();
 }
