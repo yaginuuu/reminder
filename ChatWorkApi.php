@@ -35,7 +35,7 @@ class ChatWorkApi{
         $json_decode_data =  $json->decode($chat_work_data);
 
         if(empty($json_decode_data)){
-            echo '';
+            echo 'decodeできません.';
         }else{
             return $json_decode_data;
         }
