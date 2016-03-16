@@ -16,13 +16,15 @@ class FormatTextToRemindForChatWork{
     }
 
     /**
-     *  リマインドメッセージの整形を行う
+     *  リマインドするメッセージの整形を行う
      *
      * ・期限が今日のタスクから1週間前までの期限切れのタスクを降順に並び替える
      * @return array タスク期限ごとのメッセージの配列
      */
     public function getFormatMessageText(){
-        $deadline_list = $this->getFormatTasks();
+        $last_week = strtotime(date('c', strtotime('-1 week')));
+        $tomorrow = strtotime(date('c', strtotime('+1 day')));
+        $deadline_list = $this->getFormatTasks($last_week, $tomorrow);
         $today = strtotime(date('Y/m/d'));
         $message_text = array();
 
@@ -57,7 +59,7 @@ class FormatTextToRemindForChatWork{
             $target_task = null;
         }
 
-        if(empty($message_text) === 0){
+        if(empty($message_text)){
             echo 'メッセージテキストが存在しません.';
         }else{
             return $message_text;
@@ -65,7 +67,43 @@ class FormatTextToRemindForChatWork{
     }
 
     /**
-     * ChatWorkのタスク情報を整形する
+     *  見直しタスク(期限が8日前のタスク)の概要を整形
+     *
+     * 8日前のタスクの一覧とタスクの見直しを依頼するメッセージを作成する
+     *
+     * @return string task_text 見直しタスクの概要
+     */
+    public function getFormatTaskText(){
+        $from_date = strtotime(date('c', strtotime('-1 week -1 day')));
+        $to_date   = strtotime(date('c', strtotime('-1 week')));
+        $look_again_tasks = $this->getFormatTasks($from_date, $to_date);
+
+        foreach($look_again_tasks as $deadline => $tasks){
+            $limit_time = date('Y年m月d日', $deadline);
+            foreach($tasks as $key => $task){
+                $target_task =
+                    $target_task.
+                    "by: [piconname:{$task['assigned_by_account_id']}]".PHP_EOL
+                    .$task['message'].PHP_EOL
+                    .self::CHAT_WORK_HOST_URL
+                    ."/#!rid{$task['room_id']}-{$task['message_id']}".PHP_EOL;
+                if(isset($tasks[$key + 1])){
+                    $target_task = $target_task.'[hr]';
+                }
+            }
+        }
+        $task_text = '以下のタスクの期限が過ぎています。'.PHP_EOL
+            .'期限は'.$limit_time.'まででした。'.PHP_EOL
+            .'タスクの見直しを行ってください！！'.PHP_EOL
+            .'[info]'.$target_task.'[/info]';
+
+
+        return $task_text;
+    }
+
+
+    /**
+     * ChatWorkのタスク情報を期間を指定し, 整形する
      *
      * 1. タスク情報(json)を以下の条件で限定
      *  ・期限なしのタスクは排除
@@ -78,16 +116,15 @@ class FormatTextToRemindForChatWork{
      *  ・message    => タスクの詳細(全角50文字のみ表示する)
      *  ・assigned_by_account_id => タスクを作成したアカウントID
      *
+     * @param time from_date 期間A (AからBまでの期間を指定)
+     * @param time to_date   期間B (AからBまでの期間を指定)
      * @return array タスク情報の連想配列の配列
      */
-    private function getFormatTasks(){
-        $last_week = strtotime(date('c', strtotime('-1 week')));
-        $tomorrow = strtotime(date('c', strtotime('+1 day')));
-
+    private function getFormatTasks($from_date, $to_date){
         foreach($this->tasks as $task){
+            if($task['limit_time'] < $from_date) continue;
             if($task['limit_time'] === 0) continue;
-            if($tomorrow < $task['limit_time']) continue;
-            if($task['limit_time'] < $last_week) continue;
+            if($to_date < $task['limit_time']) continue;
 
             $deadline_list[$task['limit_time']][] = array(
                     'task_id'                => $task['task_id'],
@@ -100,9 +137,10 @@ class FormatTextToRemindForChatWork{
         $isKrsort = krsort($deadline_list);
 
         if($isKrsort === false){
-            echo 'ソートできません.';
-        }else{
-            return $deadline_list;
+            echo 'ソートできません. タスクが存在しません.';
+            $deadline_list = null;
         }
+
+        return $deadline_list;
     }
 }
