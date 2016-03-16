@@ -109,10 +109,6 @@ class ChatWorkApi{
 
         $ch = curl_init();
 
-        echo $end_point_url.PHP_EOL;
-        echo $message_text.PHP_EOL;
-        echo $to_id.PHP_EOL;
-        echo $limit.PHP_EOL;
         curl_setopt($ch, CURLOPT_URL, self::HOST_NAME.$end_point_url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-ChatWorkToken: {$this->chat_work_token}"));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
