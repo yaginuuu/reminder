@@ -28,6 +28,7 @@ class FormatTextToRemindForChatWork{
         $deadline_list = $this->getFormatTasks($last_week, $tomorrow);
         if(is_null($deadline_list)) return null;
         $message_text = array();
+        $target_task = null;
 
         foreach($deadline_list as $deadline => $tasks){
             $deadline = strtotime(date('Y/m/d', $deadline));
