@@ -16,5 +16,6 @@ $ crontab -e
 ```
 以下を入力してください.
 ```
-0 10 0 0 1-5 php_path ./task_reminder_for_chatwork/main.php 自分のChatWorkのAPIトークン
+0 10 * * 1-5 /usr/bin/php /Users/yaginuma.takuya/reminder/main.php 自分のChatWorkAPIトークン
 ```
+＊phpのパスはご確認ください.
