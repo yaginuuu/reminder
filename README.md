@@ -18,4 +18,4 @@ $ crontab -e
 ```
 0 10 * * 1-5 /usr/bin/php /Users/yaginuma.takuya/reminder/main.php 自分のChatWorkAPIトークン
 ```
-＊phpのパスはご確認ください.
+＊phpのパス, 起動パスはご確認ください.
