@@ -80,6 +80,7 @@ class FormatTextToRemindForChatWork{
         $to_date   = strtotime(date('c', strtotime('-1 week')));
         $look_again_tasks = $this->getFormatTasks($from_date, $to_date);
         if(is_null($look_again_tasks)) return null;
+        $target_task = null;
 
         foreach($look_again_tasks as $deadline => $tasks){
             $limit_time = date('Y年m月d日', $deadline);
