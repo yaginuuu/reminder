@@ -4,7 +4,6 @@
  * ChatWorkのリマインダーの通知内容を整形する
  *
  * @author yaginuuu <yaginuma.takuya@hamee.co.jp>
- * @copyright Hamee.inc All Rights Reserved
  */
 class FormatTextToRemindForChatWork{
     const CHAT_WORK_HOST_URL = 'https://kcw.kddi.ne.jp';

@@ -1,6 +1,7 @@
 <?php
 
-error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+ini_set("display_errors", On);
+error_reporting(E_ALL);
 date_default_timezone_set('UTC');
 
 require_once('JSON.php');

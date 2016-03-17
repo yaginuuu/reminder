@@ -4,7 +4,6 @@
  * ChatWorkAPIを利用する
  *
  * @author yaginuuu <yaginuma.takuya@hamee.co.jp>
- * @copyright Hamee.inc All Rights Reserved
  */
 class ChatWorkApi{
     const HOST_NAME = 'https://api.chatwork.com';
