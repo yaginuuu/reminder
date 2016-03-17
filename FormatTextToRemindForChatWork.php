@@ -11,7 +11,7 @@ class FormatTextToRemindForChatWork{
     private $tasks;
 
     public function __construct($tasks) {
-        if(empty($tasks)) throw new Exception('タスク情報を入力してください.');
+        if(empty($tasks)) throw new Exception('タスク情報を入力してください.'.PHP_EOL);
         $this->tasks = $tasks;
     }
 

@@ -12,7 +12,7 @@ class ChatWorkApi{
 
     public function __construct($chat_work_token) {
         if(strlen($chat_work_token) === 0){
-            echo 'APIキーを入力してください!';
+            echo 'APIキーを入力してください!'.PHP_EOL;
         }else{
             $this->chat_work_token = $chat_work_token;
         }
@@ -64,8 +64,8 @@ class ChatWorkApi{
      * @return void
      */
     public function sendMessage($message_text, $key, $room_id){
-        if(empty($room_id)) throw new Exception('ルームIDを入力してください.');
-        if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.');
+        if(empty($room_id)) throw new Exception('ルームIDを入力してください.'.PHP_EOL);
+        if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.'.PHP_EOL);
 
         $end_point_url = "/v1/rooms/{$room_id}/messages";
 
@@ -84,8 +84,8 @@ class ChatWorkApi{
      * @return void
      */
     public function sendTask($task_text, $key, $room_id, $to_id, $limit){
-        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.');
-        if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.');
+        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.'.PHP_EOL);
+        if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.'.PHP_EOL);
 
         $end_point_url = "/v1/rooms/{$room_id}/tasks";
 
@@ -105,8 +105,6 @@ class ChatWorkApi{
      * @return array 通信結果
      */
     private function execCurl($end_point_url, $message_text, $to_id, $limit){
-        if(empty($end_point_url)) throw new Exception('エンドポイントを入力してください.');
-
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, self::HOST_NAME.$end_point_url);
