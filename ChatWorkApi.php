@@ -10,11 +10,7 @@ class ChatWorkApi{
     private $chat_work_token;
 
     public function __construct($chat_work_token) {
-        if(strlen($chat_work_token) === 0){
-            echo 'APIキーを入力してください!'.PHP_EOL;
-        }else{
-            $this->chat_work_token = $chat_work_token;
-        }
+        $this->chat_work_token = $chat_work_token;
     }
 
     /**
@@ -63,8 +59,8 @@ class ChatWorkApi{
      * @return void
      */
     public function sendMessage($message_text, $key, $room_id){
-        if(empty($room_id)) throw new Exception('ルームIDを入力してください.'.PHP_EOL);
-        if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.'.PHP_EOL);
+        if(empty($room_id)) throw new Exception('ルームIDを入力してください.');
+        if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.');
 
         $end_point_url = "/v1/rooms/{$room_id}/messages";
 
@@ -83,8 +79,8 @@ class ChatWorkApi{
      * @return void
      */
     public function sendTask($task_text, $key, $room_id, $to_id, $limit){
-        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.'.PHP_EOL);
-        if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.'.PHP_EOL);
+        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.');
+        if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.');
 
         $end_point_url = "/v1/rooms/{$room_id}/tasks";
 
@@ -108,6 +104,7 @@ class ChatWorkApi{
 
         curl_setopt($ch, CURLOPT_URL, self::HOST_NAME.$end_point_url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-ChatWorkToken: {$this->chat_work_token}"));
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         if(isset($message_text)){
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
@@ -120,11 +117,10 @@ class ChatWorkApi{
         $curl_data = curl_exec($ch);
         $errno = curl_errno($ch);
         $error = curl_error($ch);
+        $info = curl_getinfo($ch);
 
         if($errno) {
-            $info = curl_getinfo($ch);
-            throw new Exception('HTTPステータスコードは'.$info['http_code'].PHP_EOL
-                    .$error);
+            throw new Exception('通信できませんでした. APIトークンを再度入力してください.');
         }
 
         curl_close($ch);
