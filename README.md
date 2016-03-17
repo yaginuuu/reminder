@@ -9,6 +9,8 @@
 - タスクを作成
     - 期限が1週間過ぎたタスクについて, 見直し依頼するタスク
 
+＊
+
 ## Usage
 ```
 $ git clone https://bitbucket.org/yaginuuu/task_reminder_for_chatwork

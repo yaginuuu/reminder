@@ -8,37 +8,49 @@ require_once('JSON.php');
 require_once('ChatWorkApi.php');
 require_once('FormatTextToRemindForChatWork.php');
 
-$today = time();
-try{
-    if(isset($argv[1])){
-        $chat_work_api = new ChatWorkApi($argv[1]);
-        $chat_work_tasks = $chat_work_api->get('/v1/my/tasks?status=open');
-        $myself_data = $chat_work_api->get('/v1/me');
+ $chat_work_token = isset($argv[1]) ? $argv[1] : null;
+ $from_date       = isset($argv[2]) ? $argv[2] : 7;
+ $to_date         = isset($argv[3]) ? $argv[3] : 1;
+ $order           = isset($argv[4]) ? $argv[4] : 'DESC';
 
-        if(isset($chat_work_api)){
-            $format_text_to_remind = new FormatTextToRemindForChatWork($chat_work_tasks);
-            $formatted_text_messages = $format_text_to_remind->getFormatMessageText();
-            $formatted_text_task = $format_text_to_remind->getFormatTaskText();
+main($chat_work_token, $from_date, $to_date, $order);
 
-            if(isset($formatted_text_task)){
-                $chat_work_api->sendTask($formatted_text_task, 0, $myself_data['room_id'],
-                        $myself_data['account_id'], $today);
+function main($chat_work_token, $from_date, $to_date, $order){
+    $today = time();
+    try{
+        if(isset($chat_work_token)){
+            $chat_work_api = new ChatWorkApi($chat_work_token);
+            $chat_work_tasks = $chat_work_api->get('/v1/my/tasks?status=open');
+            $myself_data = $chat_work_api->get('/v1/me');
+
+            if(isset($chat_work_tasks)){
+                $format_text = new FormatTextToRemindForChatWork($chat_work_tasks);
+                $formatted_text_messages =
+                    $format_text->getFormatMessageText($from_date, $to_date, $order);
+                $formatted_text_task = $format_text->getFormatTaskText();
+
+                if(isset($formatted_text_task)){
+                    $chat_work_api->sendTask($formatted_text_task, 0, $myself_data['room_id'],
+                            $myself_data['account_id'], $today);
+                    echo '見直し依頼タスクを作成しました！'.PHP_EOL;
+                }else{
+                    echo '見直しするタスクが存在しません.'.PHP_EOL;
+                }
+
+                if(isset($formatted_text_messages)){
+                    array_walk($formatted_text_messages,
+                            array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
+                    echo 'タスクをリマインドしました！'.PHP_EOL;
+                }else{
+                    echo 'リマインドするタスクが存在しません.'.PHP_EOL;
+                }
             }else{
-                echo '見直しするタスク(期限が8日前)が存在しません.'.PHP_EOL;
-            }
-
-            if(isset($formatted_text_messages)){
-                array_walk($formatted_text_messages,
-                        array($chat_work_api, 'sendMessage'), $myself_data['room_id']);
-            }else{
-                echo 'リマインドするタスク(期限が今日-7日前)が存在しません.'.PHP_EOL;
+                echo 'ChatWorkのタスクが存在しないので, リマインドできません.';
             }
         }else{
-            echo 'ChatWorkのタスクが存在しないので, リマインドできません.';
+            echo 'APIトークンを入力してください.'.PHP_EOL;
         }
-    }else{
-        echo 'APIトークンを入力してください.'.PHP_EOL;
+    }catch(Exception $e){
+        echo $e->getMessage();
     }
-}catch(Exception $e){
-    echo $e->getMessage();
 }

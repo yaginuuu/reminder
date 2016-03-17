@@ -19,14 +19,15 @@ class FormatTextToRemindForChatWork{
      * ・期限が今日のタスクから1週間前までの期限切れのタスクを降順に並び替える
      * @return array タスク期限ごとのメッセージの配列
      */
-    public function getFormatMessageText(){
+    public function getFormatMessageText($from_date, $to_date, $order){
         $today = strtotime(date('Y/m/d'));
-        $last_week = strtotime(date('c', strtotime('-1 week')));
-        $tomorrow = strtotime(date('c', strtotime('+1 day')));
-        $deadline_list = $this->getFormatTasks($last_week, $tomorrow);
+        $from_date = strtotime(date('c', strtotime('-'.$from_date.' day')));
+        $to_date   = strtotime(date('c', strtotime('+'.$to_date.' day')));
+        $deadline_list = $this->getFormatTasks($from_date, $to_date, $order);
         if(is_null($deadline_list)) return null;
         $message_text = array();
         $target_task = null;
+        $future_message_box = null;
 
         foreach($deadline_list as $deadline => $tasks){
             $deadline = strtotime(date('Y/m/d', $deadline));
@@ -42,19 +43,32 @@ class FormatTextToRemindForChatWork{
                     $target_task = $target_task.'[hr]';
                 }
             }
-            if($deadline === $today){
-                //今日のタスクを格納
-                $message_box =
-                    "[info][title](*)期日は今日です！終わらせましょう！(*)[/title]"
-                    .$target_task.'[/info]';
-                array_unshift($message_text, $message_box);
-            }else{
-                //期限切れのタスクを格納
-                $limit_time = date('Y年m月d日', $deadline);
-                $message_box =
+
+            $limit_time = date('Y年m月d日', $deadline);
+            if($deadline > $today){
+                //期限前のタスクを格納
+                $future_message_box =
+                    $future_message_box.
                     "[info][title]期日は{$limit_time}まで[/title]"
                     .$target_task.'[/info]';
+            }elseif($deadline === $today){
+                $future_message_box =
+                    $future_message_box.
+                    "[info][title]期日は今日です！:D[/title]"
+                    .$target_task.'[/info]';
+            }else{
+                //期限切れのタスクを格納
+                $message_box =
+                    "[info][title]期日が過ぎています！期日は{$limit_time}まで[/title]"
+                    .$target_task.'[/info]';
                 $message_text[] = $message_box;
+            }
+            //期限前のタスクをまとめる
+            if($tasks === end($deadline_list) && isset($future_message_box)){
+                $message_box =
+                    "[info][title](*)もうすぐ期限です！終わらせましょう！(*)[/title]"
+                    .$future_message_box.'[/info]';
+                array_unshift($message_text, $message_box);
             }
             $target_task = null;
         }
@@ -76,7 +90,7 @@ class FormatTextToRemindForChatWork{
     public function getFormatTaskText(){
         $from_date = strtotime(date('c', strtotime('-1 week -1 day')));
         $to_date   = strtotime(date('c', strtotime('-1 week')));
-        $look_again_tasks = $this->getFormatTasks($from_date, $to_date);
+        $look_again_tasks = $this->getFormatTasks($from_date, $to_date, 'DESC');
         if(is_null($look_again_tasks)) return null;
         $target_task = null;
 
@@ -121,7 +135,7 @@ class FormatTextToRemindForChatWork{
      * @param time to_date   期間B (AからBまでの期間を指定)
      * @return array タスク情報の連想配列の配列
      */
-    private function getFormatTasks($from_date, $to_date){
+    private function getFormatTasks($from_date, $to_date, $order){
         foreach($this->tasks as $task){
             if($task['limit_time'] < $from_date) continue;
             if($task['limit_time'] === 0) continue;
@@ -138,7 +152,13 @@ class FormatTextToRemindForChatWork{
         if(empty($deadline_list)){
             return null;
         }else{
-            $isKrsort = krsort($deadline_list);
+            if($order === 'ASC'){
+                $isKrsort = ksort($deadline_list);
+            }elseif($order === 'DESC'){
+                $isKrsort = krsort($deadline_list);
+            }else{
+                throw new Exception('ORDER_REMIND_TASK_OPTIONの設定を変更してください.');
+            }
         }
 
         if($isKrsort === false){
