@@ -1,6 +1,8 @@
 <?php
 
+error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 date_default_timezone_set('UTC');
+
 require_once('JSON.php');
 require_once('ChatWorkApi.php');
 require_once('FormatTextToRemindForChatWork.php');
