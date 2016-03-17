@@ -66,7 +66,7 @@ class FormatTextToRemindForChatWork{
             //期限前のタスクをまとめる
             if($tasks === end($deadline_list) && isset($future_message_box)){
                 $message_box =
-                    "[info][title](*)もうすぐ期限です！終わらせましょう！(*)[/title]"
+                    "[info][title](*)もうすぐ期限です！(*)[/title]"
                     .$future_message_box.'[/info]';
                 array_unshift($message_text, $message_box);
             }
