@@ -8,10 +8,11 @@ require_once('JSON.php');
 require_once('ChatWorkApi.php');
 require_once('FormatTextToRemindForChatWork.php');
 
- $chat_work_token = isset($argv[1]) ? $argv[1] : null;
- $from_date       = isset($argv[2]) ? $argv[2] : 7;
- $to_date         = isset($argv[3]) ? $argv[3] : 1;
- $order           = isset($argv[4]) ? $argv[4] : 'DESC';
+$options         = getopt('f:t:', array('token:', 'asc'));
+$chat_work_token = isset($options['token']) ? $options['token'] : null;
+$from_date       = isset($options['f']) && is_numeric($options['f']) ? $options['f'] : 7;
+$to_date         = isset($options['t']) && is_numeric($options['t']) ? $options['t'] : 1;
+$order           = isset($options['asc']) ? 'ASC' : 'DESC';
 
 main($chat_work_token, $from_date, $to_date, $order);
 
@@ -19,9 +20,9 @@ function main($chat_work_token, $from_date, $to_date, $order){
     $today = time();
     try{
         if(isset($chat_work_token)){
-            $chat_work_api = new ChatWorkApi($chat_work_token);
+            $chat_work_api   = new ChatWorkApi($chat_work_token);
             $chat_work_tasks = $chat_work_api->get('/v1/my/tasks?status=open');
-            $myself_data = $chat_work_api->get('/v1/me');
+            $myself_data     = $chat_work_api->get('/v1/me');
 
             if(isset($chat_work_tasks)){
                 $format_text = new FormatTextToRemindForChatWork($chat_work_tasks);

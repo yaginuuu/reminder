@@ -59,7 +59,7 @@ class ChatWorkApi{
      * @return void
      */
     public function sendMessage($message_text, $key, $room_id){
-        if(empty($room_id)) throw new Exception('ルームIDを入力してください.');
+        if(empty($room_id))      throw new Exception('ルームIDを入力してください.');
         if(empty($message_text)) throw new Exception('送信するメッセージを入力してください.');
 
         $end_point_url = "/v1/rooms/{$room_id}/messages";
@@ -79,7 +79,7 @@ class ChatWorkApi{
      * @return void
      */
     public function sendTask($task_text, $key, $room_id, $to_id, $limit){
-        if(empty($to_id)) throw new Exception('タスク担当者IDを入力してください.');
+        if(empty($to_id))     throw new Exception('タスク担当者IDを入力してください.');
         if(empty($task_text)) throw new Exception('送信するタスク概要を入力してください.');
 
         $end_point_url = "/v1/rooms/{$room_id}/tasks";
@@ -115,9 +115,9 @@ class ChatWorkApi{
                             )));
         }
         $curl_data = curl_exec($ch);
-        $errno = curl_errno($ch);
-        $error = curl_error($ch);
-        $info = curl_getinfo($ch);
+        $errno     = curl_errno($ch);
+        $error     = curl_error($ch);
+        $info      = curl_getinfo($ch);
 
         if($errno) {
             throw new Exception('通信できませんでした. APIトークンを再度入力してください.');
